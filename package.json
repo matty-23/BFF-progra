@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@nestjs/platform-fastify": "^11.1.24",
+    "fastify": "^5.8.5",
+    "reflect-metadata": "^0.2.2"
+  }
+}
