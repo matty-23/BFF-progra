@@ -1,10 +1,56 @@
 export default class User{
-    id!: string;
-    nombre!: string;
-    apellido!:string;
-    email!:string;
-    username!:string;
-    password!:string;
-    fechaCreacion!: Date;
-    
+    private id!: string;
+    private nombre!: string;
+    private apellido!:string;
+    private email!:string;
+    private username!:string;
+    private password!:string;
+    private fechaCreacion!:Date;
+
+    constructor(id:string, nombre: string, apellido: string, email: string, username: string, password: string,fechaCreacion:Date) {
+        this.id = id;
+        this.nombre = nombre;
+        this.apellido = apellido;
+        this.email = email;
+        this.username = username;
+        this.password = password;
+        this.fechaCreacion = fechaCreacion;
+    }
+
+    getId(): string {
+        return this.id;
+    }
+    getNombre(): string {
+        return this.nombre;
+    }
+    getApellido(): string {
+        return this.apellido;
+    }
+    getEmail(): string {
+        return this.email;
+    }
+    getUsername(): string {
+        return this.username;
+    }
+    getPassword(): string {
+        return this.password;
+    }
+    getFechaCreacion(): Date {
+        return this.fechaCreacion;
+    }
+    setNombre(nombre: string): void {
+        this.nombre = nombre;
+    }
+    setApellido(apellido: string): void {
+        this.apellido = apellido;
+    }
+    setEmail(email: string): void {
+        this.email = email;
+    }
+    setUsername(username: string): void {
+        this.username = username;
+    }
+    setPassword(password: string): void {
+        this.password = password;
+    }
 }

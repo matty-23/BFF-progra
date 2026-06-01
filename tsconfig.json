@@ -10,6 +10,7 @@
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "incremental": true
+    "incremental": true,
+    "types": ["node"]
   }
 }

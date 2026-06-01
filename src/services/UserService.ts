@@ -9,11 +9,11 @@ export default class UserService implements IUserService{
     async getUserById(id: string): Promise<UserDto> {
         const user = await this._UserClient.getById(id);
         const userDto: UserDto ={
-            id: user.id,
-            nombre: user.nombre,
-            email: user.email,
-            username: user.username,
-            profileUrl: `http://localhost:3000/api/users/${user.id}/profile`
+            id: user.getId(),
+            nombre: user.getNombre(),
+            email: user.getEmail(),
+            username: user.getUsername(),
+            profileUrl: `http://localhost:3000/api/users/${user.getId()}/profile`
         }
         return userDto;
 
@@ -21,11 +21,11 @@ export default class UserService implements IUserService{
     async createUser(user: UserDto): Promise <UserDto>{
         const newUser= await this._UserClient.create(user);
         const userDto: UserDto ={
-            id: newUser.id,
-            nombre: newUser.nombre,
-            email: newUser.email,
-            username: newUser.username,
-            profileUrl: `http://localhost:3000/api/users/${newUser.id}/profile`
+            id: newUser.getId(),
+            nombre: newUser.getNombre(),
+            email: newUser.getEmail(),
+            username: newUser.getUsername(),
+            profileUrl: `http://localhost:3000/api/users/${newUser.getId()}/profile`
         }
         return userDto;
     }
@@ -33,11 +33,11 @@ export default class UserService implements IUserService{
     async updateUser(id: string, user: UserDto): Promise<UserDto> {
         const updatedUser = await this._UserClient.updateById(id, user);
         const userDto: UserDto ={
-            id: updatedUser.id,
-            nombre: updatedUser.nombre,
-            email: updatedUser.email,
-            username: updatedUser.username,
-            profileUrl: `http://localhost:3000/api/users/${updatedUser.id}/profile`
+            id: updatedUser.getId(),
+            nombre: updatedUser.getNombre(),
+            email: updatedUser.getEmail(),
+            username: updatedUser.getUsername(),
+            profileUrl: `http://localhost:3000/api/users/${updatedUser.getId()}/profile`
         }
         return userDto;
     }
