@@ -1,9 +1,9 @@
-import { Controller, Get, Param, NotFoundException, Post, Body, BadRequestException, HttpCode, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Param, NotFoundException, Post, Body, BadRequestException, HttpCode, Put, Delete, Patch } from '@nestjs/common';
 import UserDto from '../DTO/UserDto.js';
 import { IUserService } from '../interfaces/IUserService.js'
 import { Inject } from '@nestjs/common';
 
-@Controller('api/Users')
+@Controller('api/users')
 export class UserController{
     constructor(@Inject('IUserService') private readonly _UserService: IUserService){}
 
@@ -16,8 +16,8 @@ export class UserController{
         return user;
     }
 
-    @Put(':id')
-    async updateUser(@Param('id') id: string, @Body() userDto: UserDto): Promise<UserDto> {
+    @Patch(':id')
+    async patchUser(@Param('id') id: string, @Body() userDto: UserDto): Promise<UserDto> {
         try {
             const updatedUser = await this._UserService.updateUser(id, userDto);
             return updatedUser;
