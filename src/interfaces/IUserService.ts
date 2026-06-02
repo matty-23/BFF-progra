@@ -1,4 +1,4 @@
-import UserDto from "../DTO/UserDto.js";
+import UserDto from "../DTO/UserDto";
 
 export interface IUserService{
     getUserById(id:string): Promise<UserDto>;

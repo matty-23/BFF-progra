@@ -56,14 +56,19 @@ export default class UserProfile implements IUserClient{
                throw error; 
           }
      }
-     async updateById(id:string, user:UserDto): Promise<User>{
+     async updateById(id:string, user:UserDto): Promise<boolean>{
           try{
                const response = await fetch(`${process.env.BASE_URL}/Usuarios/${id}`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify(user )
+                body: JSON.stringify({
+                    id: user.id,
+                    nombre: user.nombre,
+                    email: user.email,
+                    username: user.username
+                })
             });
             if (!response.ok) {
                 if (response.status === 404) {
@@ -71,8 +76,7 @@ export default class UserProfile implements IUserClient{
                 }
                 throw new Error(`Error en el servidor Core: ${response.statusText}`);
             }
-            const newUser : User = await response.json();
-            return newUser;
+            return true;
           }
           catch(error:any){
                throw error; 

@@ -1,6 +1,6 @@
 import { Controller, Get, Param, NotFoundException, Post, Body, BadRequestException, HttpCode, Put, Delete, Patch } from '@nestjs/common';
-import UserDto from '../DTO/UserDto.js';
-import { IUserService } from '../interfaces/IUserService.js'
+import UserDto from '../DTO/UserDto';
+import { IUserService } from '../interfaces/IUserService'
 import { Inject } from '@nestjs/common';
 
 @Controller('api/users')
@@ -16,8 +16,8 @@ export class UserController{
         return user;
     }
 
-    @Patch(':id')
-    async patchUser(@Param('id') id: string, @Body() userDto: UserDto): Promise<UserDto> {
+    @Put(':id')
+    async putUser(@Param('id') id: string, @Body() userDto: UserDto): Promise<UserDto> {
         try {
             const updatedUser = await this._UserService.updateUser(id, userDto);
             return updatedUser;

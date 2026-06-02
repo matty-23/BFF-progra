@@ -1,7 +1,7 @@
-import UserDto from '../DTO/UserDto.js';
-import { IUserService } from '../interfaces/IUserService.js';
-import IUserClient from '../interfaces/IUserClient.js';
-import { Inject } from '@nestjs/common/decorators/core/index.js';
+import UserDto from '../DTO/UserDto';
+import { IUserService } from '../interfaces/IUserService';
+import IUserClient from '../interfaces/IUserClient';
+import { Inject } from '@nestjs/common/decorators/core/index';
 
 export default class UserService implements IUserService{
     constructor(@Inject('IUserClient') private readonly _UserClient: IUserClient){}
@@ -32,14 +32,11 @@ export default class UserService implements IUserService{
 
     async updateUser(id: string, user: UserDto): Promise<UserDto> {
         const updatedUser = await this._UserClient.updateById(id, user);
-        const userDto: UserDto ={
-            id: updatedUser.getId(),
-            nombre: updatedUser.getNombre(),
-            email: updatedUser.getEmail(),
-            username: updatedUser.getUsername(),
-            profileUrl: `http://localhost:3000/api/users/${updatedUser.getId()}/profile`
+        if (!updatedUser) {
+            throw new Error(`No se pudo actualizar el usuario con ID ${id}.`);
         }
-        return userDto;
+
+        return await this.getUserById(id);
     }
     async deleteUser(id: string): Promise<void> {
         await this._UserClient.deleteById(id);
