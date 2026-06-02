@@ -1,4 +1,4 @@
-import { Controller, Post, Body } from '@nestjs/common';
+import { Controller, Post, Body, Headers } from '@nestjs/common';
 import { IAuthService } from '../interfaces/IAuthService';
 
 @Controller('api/auth')
@@ -7,7 +7,23 @@ export class AuthController {
     
     @Post('login')
     async login(@Body() credenciales: any) {
-        // El controlador solo delega la tarea al servicio
         return await this.authService.Login(credenciales);
+    }
+
+    @Post('logout')
+    async logout(@Headers('authorization') authHeader: string) {
+        const token = authHeader ? authHeader.split(' ')[1] : undefined;
+        
+        await this.authService.LoginOut({ token });
+        return { message: 'Logout exitoso' };
+    }
+
+    @Post('register')
+    async register(@Body() credenciales: any) {
+        const resultado = await this.authService.Register(credenciales);
+        return { 
+            message: 'Registro exitoso', 
+            data: resultado 
+        };
     }
 }
