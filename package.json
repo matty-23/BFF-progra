@@ -1,0 +1,1 @@
+{"name":"backend","version":"1.0.0","main":"src/main.ts","scripts":{"build":"tsc -p tsconfig.json","start":"ts-node src/main.ts","start:dev":"ts-node-dev --respawn --transpile-only src/main.ts"},"dependencies":{"@nestjs/platform-fastify":"^11.1.24","fastify":"^5.8.5","reflect-metadata":"^0.2.2"},"devDependencies":{"@types/node":"^25.9.1","ts-node-dev":"^2.0.0"}}
