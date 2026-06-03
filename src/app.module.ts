@@ -19,7 +19,7 @@ import { TokenMiddleware } from './middlewares/TokenMiddleware';
         options: {
           package: 'auth',
           protoPath: join(process.cwd(), 'src/proto/auth.proto'), 
-          url: 'localhost:50051', 
+          url: process.env.GRPC_AUTH_URL, 
         },
       },
     ]),
