@@ -1,15 +1,24 @@
 import IUserClient from '../interfaces/IUserClient.js';
 import User from '../viewModels/User.js';
 import UserDto from '../DTO/UserDto.js';
+import { requestContext } from '../database/context/RequestContext';
 
-export default class UserProfile implements IUserClient{
-     async getById(id: string): Promise<User> {
+export default class UserProfile implements IUserClient {
+    private getAuthHeaders(): HeadersInit {
+        const store = requestContext.getStore();
+        const token = store?.get('token');
+        
+        return {
+            'Content-Type': 'application/json',
+            ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+        };
+    }
+
+    async getById(id: string): Promise<User> {
         try {
             const response = await fetch(`${process.env.BASE_URL}/Usuarios/${id}`, {
                 method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: this.getAuthHeaders() // Inyectamos los headers dinámicos
             });
 
             if (!response.ok) {
@@ -35,9 +44,7 @@ export default class UserProfile implements IUserClient{
           try{
                const response = await fetch(`${process.env.BASE_URL}/Usuarios/${user.id}`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: this.getAuthHeaders(), 
                 body: JSON.stringify(user)
             });
             if (!response.ok) {
@@ -60,9 +67,7 @@ export default class UserProfile implements IUserClient{
           try{
                const response = await fetch(`${process.env.BASE_URL}/Usuarios/${id}`, {
                 method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: this.getAuthHeaders(),
                 body: JSON.stringify({
                     id: user.id,
                     nombre: user.nombre,
@@ -86,9 +91,7 @@ export default class UserProfile implements IUserClient{
          try{
                const response = await fetch(`${process.env.BASE_URL}/Usuarios/${id}`, {
                 method: 'DELETE',
-                headers: {
-                    'Content-Type': 'application/json'
-                }
+                headers: this.getAuthHeaders()
             });
             if (!response.ok) {
                 if (response.status === 404) {
