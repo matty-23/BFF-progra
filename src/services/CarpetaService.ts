@@ -1,30 +1,19 @@
 import { Injectable, Inject, Logger } from '@nestjs/common';
 import { ICarpetaCacheRepository } from '../interfaces/ICarpetaRepository';
-// Eliminamos la importación de ICarpetaService del constructor
-import { ICarpetaClient } from '../interfaces/ICarpetaClient';
-import { Observable } from 'rxjs';
+import { CarpetaClient } from '../clients/CarpetaClient';
 import { ICarpetaService } from '../interfaces/ICarpetaService';
-
-const CACHE_TTL_SECONDS = parseInt(process.env.CARPETAS_CACHE_TTL ?? '300', 10);
 
 @Injectable()
 export class CarpetasCacheService implements ICarpetaService {
     private readonly logger = new Logger(CarpetasCacheService.name);
 
-    constructor(
-        @Inject('ICarpetaCacheRepository')
-        private readonly cacheRepo: ICarpetaCacheRepository,
-
-        // 👇 Eliminamos la inyección circular y dejamos SOLO el cliente gRPC
-        @Inject('ICarpetaClient')
-        private readonly carpetaClient: ICarpetaClient
-    ) {}
+    constructor(@Inject('ICarpetaCacheRepository')private readonly cacheRepo: ICarpetaCacheRepository, @Inject('ICarpetaClient')private readonly carpetaClient: CarpetaClient) {}
 
     async obtenerCarpetaPorId(id: any): Promise<any> {
-        this.logger.debug(`Consultando carpeta por ID ${id} directamente al backend (sin caché)`);
         return this.carpetaClient.obtenerCarpetaPorId(id);
     }
-async obtenerCarpetasPrincipales(data: { id: string }): Promise<any> {
+
+    async obtenerCarpetasPrincipales(data: { id: string }): Promise<any> {
         const request = { id: String(data.id) };
         const cacheKey = this.buildKey(request.id);
         
@@ -35,10 +24,9 @@ async obtenerCarpetasPrincipales(data: { id: string }): Promise<any> {
         }
         
         this.logger.debug(`Cache MISS para usuario ${request.id}, consultando backend`);
-        // Aquí esperamos (await) a que tu cliente gRPC responda
         const response = await this.carpetaClient.obtenerCarpetasPrincipales(request.id);
-        
-        await this.cacheRepo.upsert(cacheKey, request.id, response, CACHE_TTL_SECONDS);
+        const cache_seconds=300;
+        await this.cacheRepo.upsert(cacheKey, request.id, response, cache_seconds);
         return response;
     }
 
@@ -47,12 +35,29 @@ async obtenerCarpetasPrincipales(data: { id: string }): Promise<any> {
         await this.cacheRepo.deleteByUsuario(idUsuario);
     }
 
-    private buildKey(idUsuario: string): string {
-        return `principales:${idUsuario}`;
+    async obtenerContenidoCarpeta(id: any): Promise<any> {
+        return this.carpetaClient.obtenerContenidoCarpeta(id);
     }
 
-    async obtenerContenidoCarpeta(id: any): Promise<any> {
-        this.logger.debug(`Consultando contenido de la carpeta ${id} directamente al backend (sin caché)`);
-        return this.carpetaClient.obtenerContenidoCarpeta(id);
+    async crearCarpeta(idPadre: string, nombre: string, idUsuario: string): Promise<any> {
+        const nuevaCarpeta = await this.carpetaClient.registrarCarpeta(idPadre, nombre, idUsuario);
+        await this.invalidarCacheUsuario(idUsuario);
+        return nuevaCarpeta;
+    }
+
+    async actualizarCarpeta(id: string, nombre: string, idUsuario: string, readMe: string): Promise<any> {
+        const resultado = await this.carpetaClient.actualizarCarpeta(id, nombre, idUsuario, readMe);
+        await this.invalidarCacheUsuario(idUsuario);
+        return resultado;
+    }
+
+    async eliminarCarpeta(id: string, idUsuario: string): Promise<any> {
+        const resultado = await this.carpetaClient.eliminarCarpeta(id);
+        await this.invalidarCacheUsuario(idUsuario);
+        return resultado;
+    }
+
+    private buildKey(idUsuario: string): string {
+        return `principales:${idUsuario}`;
     }
 }

@@ -1,14 +1,10 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs';
+import { firstValueFrom} from 'rxjs';
 import { ICarpetaClient } from '../interfaces/ICarpetaClient';
-import { Observable } from 'rxjs';
+import { ComponenteDto } from '../DTO/ComponenteDto';
+import { CarpetaGrpcService } from '../interfaces/CarpetaGrpcService';
 
-interface CarpetaGrpcService {
-    GetById(data: { id: string }): Observable<any>;
-    CarpetasPrincipales(data: { id: string }): Observable<any>;
-    GetComponentes(data: { id: string }): Observable<any>;
-}
 
 @Injectable()
 export class CarpetaClient implements ICarpetaClient, OnModuleInit {
@@ -23,43 +19,63 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
         this.carpetaGrpcService = this.client.getService<CarpetaGrpcService>('CarpetaService');
     }
 
-    async obtenerCarpetaPorId(id: any): Promise<any> {
-        const request = { id: String(id) };
-        const response = await lastValueFrom(this.carpetaGrpcService.GetById(request));
-        return response;
+    async obtenerCarpetaPorId(id: string | number): Promise<ComponenteDto> {
+        return await firstValueFrom(this.carpetaGrpcService.GetById({ id: String(id) }));
     }
 
-// Tipamos el retorno para que sea claro qué devuelve
-
-
-async obtenerCarpetasPrincipales(idUsuario: string | number): Promise<any> {
-    const request = { id: String(idUsuario) };
-    const response = await lastValueFrom(this.carpetaGrpcService.CarpetasPrincipales(request));
-    
-    return {
-        MiArea: (response.listaUno || []).map(mapComponente),
-        CompartidosConmigo: [], // Por ahora vacío hasta que actualices el proto
-        Recientes: [],
-        Destacados: []
-    }; 
-}
-    
-
-    async obtenerContenidoCarpeta(id: any): Promise<any[]> {
-        const request = { id: String(id) };
-        const response = await lastValueFrom(this.carpetaGrpcService.GetComponentes(request));
+    async obtenerCarpetasPrincipales(idUsuario: string | number) {
+        const response = await firstValueFrom(
+            this.carpetaGrpcService.CarpetasPrincipales({ id: String(idUsuario) })
+        );
         
+        return {
+            MiArea: (response.listaUno || []).map(this.mapComponente),
+            CompartidosConmigo: [],
+            Recientes: [],
+            Destacados: []
+        }; 
+    }
+
+    async obtenerContenidoCarpeta(id: string | number): Promise<ComponenteDto[]> {
+        const response = await firstValueFrom(
+            this.carpetaGrpcService.GetComponentes({ id: String(id) })
+        );
         return response.componentes || [];
     }
-    
+
+    // Nuevos métodos adaptados al archivo proto
+    async registrarCarpeta(idPadre: string, nombre: string, idUsuario: string): Promise<ComponenteDto> {
+        const request = {
+            idPadre,
+            carp: { nombre, idUsuario, ReadMe: "" }
+        };
+        return await firstValueFrom(this.carpetaGrpcService.Registrar(request));
+    }
+
+    async actualizarCarpeta(id: string, nombre: string, idUsuario: string, readMe: string): Promise<boolean> {
+        const request = {
+            id,
+            doc: { nombre, idUsuario, ReadMe: readMe }
+        };
+        const response = await firstValueFrom(this.carpetaGrpcService.Actualizar(request));
+        return response.success;
+    }
+
+    async eliminarCarpeta(id: string): Promise<boolean> {
+        const response = await firstValueFrom(this.carpetaGrpcService.Eliminar({ id }));
+        return response.success;
+    }
+
+    private mapComponente = (item: any): ComponenteDto => {
+        return {
+            id: item.id,
+            nombre: item.nombre,
+            fechaCreacion: item.fechaCreacion,
+            fechaUltimaModificacion: item.fechaUltimaModificacion,
+            idUsuario: item.idUsuario,
+            ReadMe: item.ReadMe,
+            tipo: item.tipo,
+            componentes: (item.componentes || []).map(this.mapComponente),
+        };
+    }
 }
-function mapComponente(item: any): any {
-    return {
-        id: item.id,
-        nombre: item.nombre,
-        fechaCreacion: item.fechaCreacion,
-        fechaUltimaModificacion: item.fechaUltimaModificacion,
-        idUsuario: item.idUsuario,
-        ReadMe: item.ReadMe,
-        componentes: (item.componentes || []).map(mapComponente),
-    };}

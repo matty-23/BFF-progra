@@ -11,7 +11,6 @@ service CarpetaService {
   rpc CarpetasPrincipales (CarpetaIdRequest) returns (MiAreaResponse) {}
 }
 
-// La respuesta ahora tiene 3 listas independientes
 message MiAreaResponse {
     repeated ComponenteDtoGRPC listaUno = 1;
     /*repeated ComponenteDtoGRPC listaDos = 2;
@@ -19,7 +18,6 @@ message MiAreaResponse {
     repeated ComponenteDtoGRPC listaCuatro = 4;*/
 }
 
-// Tu DTO del componente igual que siempre
 message ComponenteDtoGRPC {
     string id = 1;
     string nombre = 2;
