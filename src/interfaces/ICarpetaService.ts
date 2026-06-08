@@ -1,5 +1,6 @@
 export interface ICarpetaService {
     obtenerCarpetasPrincipales(data: { id: string }): Promise<any>;
+    obtenerCarpetaPorId(id: any): Promise<any>;
     obtenerContenidoCarpeta(id: any): Promise<any>;
     invalidarCacheUsuario(idUsuario: string): Promise<void>;
     crearCarpeta(idPadre: string, nombre: string, idUsuario: string): Promise<any>;

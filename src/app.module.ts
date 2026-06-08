@@ -47,7 +47,6 @@ import { CarpetaCacheRepository } from './repository/CarpetaRepository';
   ],
   controllers: [UserController, AuthController, CarpetaController],
   providers: [
-    // 👇 Eliminé el "CarpetasCacheService" que estaba suelto aquí arriba
     {
       provide: 'ICarpetaCacheRepository',
       useClass: CarpetaCacheRepository,
