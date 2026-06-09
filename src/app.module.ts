@@ -15,6 +15,10 @@ import { CarpetaClient } from './clients/CarpetaClient';
 import { MongooseModule } from '@nestjs/mongoose';
 import { CarpetaCache, CarpetaCacheSchema } from './schemas/schemaCarpeta';
 import { CarpetaCacheRepository } from './repository/CarpetaRepository';
+import { DocumentController } from './controllers/DocumentController';
+import { DocumentoService } from './services/DocumentoService';
+import { BDDocumentClient } from './clients/BDDocumentClient';
+import { FSDocumentClient } from './clients/FSDocumentClient';
 
 @Module({
   imports: [
@@ -28,24 +32,46 @@ import { CarpetaCacheRepository } from './repository/CarpetaRepository';
         transport: Transport.GRPC,
         options: {
           package: 'auth',
-          protoPath: join(process.cwd(), 'src/proto/auth.proto'), 
-          url: process.env.GRPC_AUTH_URL, 
+          protoPath: join(process.cwd(), 'src/proto/auth.proto'),
+          url: process.env.GRPC_AUTH_URL,
         },
       },
     ]),
     ClientsModule.register([
       {
-        name: 'CARPETA_PACKAGE', 
+        name: 'CARPETA_PACKAGE',
         transport: Transport.GRPC,
         options: {
-          package: 'carpetas', 
-          protoPath: join(process.cwd(), 'src/proto/carpeta.proto'), 
-          url: 'localhost:50053', 
+          package: 'carpetas',
+          protoPath: join(process.cwd(), 'src/proto/carpeta.proto'),
+          url: 'localhost:50053',
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'DOCUMENT_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'documentos',
+          protoPath: join(process.cwd(), 'src/proto/documento.proto'),
+          url: 'localhost:50053',
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'STORAGE_PACKAGE', // Nombre para inyectar este cliente
+        transport: Transport.GRPC,
+        options: {
+          package: 'storage',
+          protoPath: join(process.cwd(), 'src/proto/storage.proto'), // Asegúrate de copiar el .proto aquí también
+          url: 'localhost:50051', // Puerto de tu microservicio de Storage
         },
       },
     ]),
   ],
-  controllers: [UserController, AuthController, CarpetaController],
+  controllers: [UserController, AuthController, CarpetaController, DocumentController],
   providers: [
     {
       provide: 'ICarpetaCacheRepository',
@@ -53,25 +79,31 @@ import { CarpetaCacheRepository } from './repository/CarpetaRepository';
     },
     AuthClient,
     CarpetaClient,
+    BDDocumentClient,
+    FSDocumentClient,
+    {
+      provide: 'IDocumentosService', // El nombre exacto que pusiste en el @Inject(...)
+      useClass: DocumentoService,   // La clase real que ejecutará el código
+    },
     {
       provide: 'IAuthService',
-      useClass: AuthService, 
+      useClass: AuthService,
     },
     {
       provide: 'IUserService',
-      useClass: UserService, 
+      useClass: UserService,
     },
     {
       provide: 'IUserClient',
-      useClass: UserProfile, 
+      useClass: UserProfile,
     },
     {
       provide: 'ICarpetaService', // El controlador pide esto
       useClass: CarpetasCacheService // NestJS entrega tu única clase
     },
     {
-      provide: 'ICarpetaClient',   
-      useClass: CarpetaClient     
+      provide: 'ICarpetaClient',
+      useClass: CarpetaClient
     },
   ],
 })

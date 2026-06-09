@@ -1,9 +1,14 @@
 export class DocumentoDTO {
-    readonly id!: number;
-    readonly nombre!: string;
-    readonly contenido!: string;
-    readonly idCarpeta!: number;
-    readonly idUsuario!: number;
+    readonly id?: string;
+    readonly nombre?: string;
+    readonly contenido?: string;
+    readonly idUsuario?: string;
     readonly fechaCreacion?: Date;
     readonly fechaModificacion?: Date;
+    readonly estado?:string;
+}
+export class CrearDocumentoDTO {
+    readonly idUsuario!: string;
+    readonly nombre?: string;
+    readonly estado?: string;
 }

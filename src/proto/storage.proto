@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package storage;
+
+service StorageService {
+  rpc UploadFile (stream FileChunk) returns (UploadResponse) {}
+  rpc DownloadFile (DownloadRequest) returns (stream FileChunk) {}
+  
+  // NUEVO: Método para eliminar archivo (necesario para la Saga/Rollback)
+  rpc DeleteFile (DeleteRequest) returns (DeleteResponse) {}
+}
+
+message FileChunk {
+  bytes content = 1;
+  string filename = 2; // El BFF DEBE enviar el ID del metadato aquí en el 1er chunk
+}
+
+message UploadResponse {
+  string storageId = 1;
+  bool success = 2;
+  string hash = 3;
+}
+
+message DownloadRequest {
+  string storageId = 1;
+}
+
+// NUEVO
+message DeleteRequest {
+  string storageId = 1;
+}
+
+message DeleteResponse {
+  bool success = 1;
+}
