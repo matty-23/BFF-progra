@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit, Inject } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
-import { firstValueFrom} from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { ICarpetaClient } from '../interfaces/ICarpetaClient';
 import { ComponenteDto } from '../DTO/ComponenteDto';
 import { CarpetaGrpcService } from '../interfaces/CarpetaGrpcService';
@@ -8,12 +8,12 @@ import { CarpetaGrpcService } from '../interfaces/CarpetaGrpcService';
 
 @Injectable()
 export class CarpetaClient implements ICarpetaClient, OnModuleInit {
-    
+
     private carpetaGrpcService!: CarpetaGrpcService;
 
     constructor(
         @Inject('CARPETA_PACKAGE') private readonly client: ClientGrpc
-    ) {}
+    ) { }
 
     onModuleInit() {
         this.carpetaGrpcService = this.client.getService<CarpetaGrpcService>('CarpetaService');
@@ -27,13 +27,14 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
         const response = await firstValueFrom(
             this.carpetaGrpcService.CarpetasPrincipales({ id: String(idUsuario) })
         );
-        
+
+
         return {
             MiArea: (response.listaUno || []).map(this.mapComponente),
             CompartidosConmigo: [],
             Recientes: [],
             Destacados: []
-        }; 
+        };
     }
 
     async obtenerContenidoCarpeta(id: string | number): Promise<ComponenteDto[]> {
@@ -62,8 +63,16 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
     }
 
     async eliminarCarpeta(id: string): Promise<boolean> {
-        const response = await firstValueFrom(this.carpetaGrpcService.Eliminar({ id }));
-        return response.success;
+        try {
+            const response = await firstValueFrom(this.carpetaGrpcService.Eliminar({ id }));
+            return response.success;
+        } catch (error: any) {
+            // Imprimimos el mensaje exacto que viene desde tu microservicio gRPC
+            console.error(`❌ [gRPC Error] Falló al eliminar la carpeta (ID: ${id})`);
+            console.error(`Motivo:`, error.details || error.message);
+
+            throw error; // Dejamos que siga su curso para que el frontend se entere
+        }
     }
 
     private mapComponente = (item: any): ComponenteDto => {
