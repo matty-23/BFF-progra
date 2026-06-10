@@ -1,7 +1,10 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject, UseInterceptors } from '@nestjs/common';
 import { IDocumentosService } from '../interfaces/IDocumentService';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../guards/JwtAuthGuard';
 
 @Controller('api/documentos')
+@UseGuards(JwtAuthGuard)
 export class DocumentController {
     constructor(@Inject('IDocumentosService')private readonly documentosService: IDocumentosService) { }
 

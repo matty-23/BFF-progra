@@ -1,7 +1,11 @@
 import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject } from '@nestjs/common';
 import { ICarpetaService } from '../interfaces/ICarpetaService';
+import { UseGuards } from '@nestjs/common';
+import { JwtAuthGuard } from '../guards/JwtAuthGuard';
+
 
 @Controller('api/carpetas')
+@UseGuards(JwtAuthGuard)
 export class CarpetaController {
     constructor(@Inject('ICarpetaService')private readonly carpetaService: ICarpetaService) { }
 
