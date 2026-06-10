@@ -1,0 +1,54 @@
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+import { ICarpetaService } from '../interfaces/ICarpetaService';
+
+@Controller('api/carpetas')
+export class CarpetaController {
+    constructor(@Inject('ICarpetaService')private readonly carpetaService: ICarpetaService) { }
+
+    @Get('carpetas-principales/:idUsuario')
+    async obtenerCarpetasPrincipales(@Param('idUsuario') idUsuario: string) {
+        return await this.carpetaService.obtenerCarpetasPrincipales({ id: idUsuario });
+    }
+
+    @Get(':id')
+    async obtenerCarpetaPorId(@Param('id') id: string) {
+        return await this.carpetaService.obtenerCarpetaPorId(id);
+    }
+
+    @Get('contenido/:id')
+    async obtenerContenidoCarpeta(@Param('id') id: string) {
+        return await this.carpetaService.obtenerContenidoCarpeta(id);
+    }
+
+    @Post(':idPadre')
+    @HttpCode(HttpStatus.CREATED)
+    async crearCarpeta(
+        @Param('idPadre') idPadre: string,
+        @Body() body: { nombre: string, idUsuario: string }
+    ) {
+        return await this.carpetaService.crearCarpeta(idPadre, body.nombre, body.idUsuario);
+    }
+
+    @Put(':id')
+    async actualizarCarpeta(
+        @Param('id') id: string,
+        @Body() body: { nombre: string, idUsuario: string, readme: string }
+    ) {
+        return await this.carpetaService.actualizarCarpeta(id, body.nombre, body.idUsuario, body.readme);
+    }
+
+    @Delete(':id/usuario/:idUsuario')
+    @HttpCode(HttpStatus.OK)
+    async eliminarCarpeta(
+        @Param('id') id: string,
+        @Param('idUsuario') idUsuario: string
+    ) {
+        return await this.carpetaService.eliminarCarpeta(id, idUsuario);
+    }
+
+    @Delete('cache/invalidar/:idUsuario')
+    @HttpCode(HttpStatus.NO_CONTENT)
+    async invalidarCache(@Param('idUsuario') idUsuario: string) {
+        await this.carpetaService.invalidarCacheUsuario(idUsuario);
+    }
+}
