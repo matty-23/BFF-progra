@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
-import { connectDB } from './schemas/conexion';
+import { connectDB } from './database/schemas/conexion';
 import dns from 'node:dns';
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);

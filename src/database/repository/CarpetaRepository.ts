@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CarpetaCache, CarpetaCacheDocument } from '../schemas/schemaCarpeta';
-import { ICarpetaCacheRepository } from '../interfaces/ICarpetaRepository';
+import { ICarpetaCacheRepository } from '../../interfaces/ICarpetaRepository';
  
 @Injectable()
 export class CarpetaCacheRepository implements ICarpetaCacheRepository {
