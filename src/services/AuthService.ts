@@ -18,7 +18,6 @@ export class AuthService implements IAuthService {
 
     async LoginOut(credenciales: any): Promise<any> {
         try {
-            // Extraemos el token si se pasó en el objeto
             const result = await this.authClient.logoutCore(credenciales?.token);
             return result;
         } catch (error) {
