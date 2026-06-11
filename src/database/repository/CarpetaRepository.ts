@@ -6,16 +6,10 @@ import { ICarpetaCacheRepository } from '../../interfaces/ICarpetaRepository';
  
 @Injectable()
 export class CarpetaCacheRepository implements ICarpetaCacheRepository {
-    constructor(
-        @InjectModel(CarpetaCache.name)
-        private readonly cacheModel: Model<CarpetaCacheDocument>,
-    ) {}
+    constructor(@InjectModel(CarpetaCache.name)private readonly cacheModel: Model<CarpetaCacheDocument>,) {}
  
     async findByCacheKey(cacheKey: string): Promise<any | null> {
-        const entry = await this.cacheModel
-            .findOne({ cacheKey, expiresAt: { $gt: new Date() } })
-            .lean()
-            .exec();
+        const entry = await this.cacheModel.findOne({ cacheKey, expiresAt: { $gt: new Date() } }).lean().exec();
  
         return entry?.data ?? null;
     }
