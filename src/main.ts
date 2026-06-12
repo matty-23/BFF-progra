@@ -3,6 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
 import { AppModule } from './app.module';
 import { connectDB } from './database/schemas/conexion';
+import { ValidationPipe } from '@nestjs/common';
+import fastifyCookie from '@fastify/cookie'; 
 import dns from 'node:dns';
 
 dns.setServers(['8.8.8.8', '8.8.4.4']);
@@ -15,12 +17,17 @@ async function bootstrap() {
       AppModule,
       new FastifyAdapter()
     );
+    await app.register(fastifyCookie, {
+      secret: process.env.COOKIE_SECRET, 
+    });
     
     app.enableCors({
-      origin: true,
+      origin: process.env.CORS_ORIGIN,
       methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
-      credentials: true,
+      credentials: true, 
     });
+
+    app.useGlobalPipes(new ValidationPipe({ whitelist: true, transform: true }));
 
     const PORT = process.env.PORT || 3000;
     await app.listen(PORT);
