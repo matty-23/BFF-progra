@@ -61,12 +61,12 @@ import { FSDocumentClient } from './clients/FSDocumentClient';
     ]),
     ClientsModule.register([
       {
-        name: 'STORAGE_PACKAGE', // Nombre para inyectar este cliente
+        name: 'STORAGE_PACKAGE', 
         transport: Transport.GRPC,
         options: {
           package: 'storage',
-          protoPath: join(process.cwd(), 'src/proto/storage.proto'), // Asegúrate de copiar el .proto aquí también
-          url: 'localhost:50051', // Puerto de tu microservicio de Storage
+          protoPath: join(process.cwd(), 'src/proto/storage.proto'), 
+          url: 'localhost:50051',
         },
       },
     ]),
