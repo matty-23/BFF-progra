@@ -58,18 +58,18 @@ export class BDDocumentClient implements IDocumentBDClient, OnModuleInit {
             id: String(id),
             doc: {
                 id: String(id),
-                nombre: doc.nombre,
-                idUsuario: doc.idUsuario,
+                nombre: doc.nombre!,
+                idUsuario: doc.idUsuario!,
                 estado: doc.estado || "COMMITTED",
                 version: "1.0",
-                fechaCreacion: doc.fechaCreacion ? new Date(doc.fechaCreacion).toISOString() : new Date().toISOString(),
+                fechaCreacion: doc.fechaCreacion! ? new Date(doc.fechaCreacion).toISOString() : new Date().toISOString(),
                 fechaUltimaModificacion: new Date().toISOString()
             }
         };
         return firstValueFrom(this.documentGrpcService.Actualizar(request, metadata));
     }
 
-    async eliminarMetadataDocumento(id: string, idUsuario: string): Promise<any> {
+    async eliminarMetadataDocumento(id: string): Promise<any> {
         const metadata = this.getGrpcMetadata();
         const request = { 
             id: String(id) 

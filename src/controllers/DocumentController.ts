@@ -23,12 +23,9 @@ export class DocumentController {
         return await this.documentosService.actualizarDocumento(id, body.nombre, req.user.idUsuario, body.contenido);
     }
 
-    @Delete(':id/usuario/:idUsuario')
+    @Delete(':id')
     @HttpCode(HttpStatus.OK)
-    async eliminarDocumento(@Param('id') id: string,@Param('idUsuario') idUsuario: string,@Req() req: any) {
-        if (req.user?.idUsuario !== idUsuario) {
-            throw new ForbiddenException('No tienes permiso para eliminar este documento');
-        }
-        return await this.documentosService.eliminarDocumento(id, idUsuario);
+    async eliminarDocumento(@Param('id') id: string,@Req() req: any) {
+        return await this.documentosService.eliminarDocumento(id);
     }
 }

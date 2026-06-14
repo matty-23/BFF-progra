@@ -113,26 +113,33 @@ export class DocumentoService implements IDocumentosService {
     }
 
 
-    obtenerDocumentoPorId(id: string): Promise<any> {
-        return this.BDClient.obtenerMetadataDocumentoPorId(id);
-    }
+async obtenerDocumentoPorId(id: string): Promise<any> {
 
-  async eliminarDocumento(id: string, idUsuario: string): Promise<any> {
+    const metadata = await this.BDClient.obtenerMetadataDocumentoPorId(id);
+    if (!metadata) {
+        throw new Error('Documento no encontrado');
+    }
+    const contenido = await this.FSClient.get(metadata.storageId);
+    return {
+        ...metadata,
+        contenido
+    };
+}
+
+  async eliminarDocumento(id: string): Promise<any> {
         this.logger.log(`Iniciando eliminación del documento: ${id}`);
         
         try {
-            // 1. Primero borramos el archivo físico del Storage
             await firstValueFrom(this.FSClient.deleteFile(id));
             this.logger.log(`✅ Archivo físico eliminado del Storage: ${id}`);
         } catch (e) {
             const error = e as Error;
             this.logger.warn(`⚠️ Error o archivo inexistente en Storage al borrar ${id}:`, error.message);
-            // No lanzamos excepción aquí por si el archivo ya no existía (idempotencia)
         }
 
         try {
-            // 2. Luego borramos los metadatos en la BD
-            const result = await this.BDClient.eliminarMetadataDocumento(id, idUsuario);
+
+            const result = await this.BDClient.eliminarMetadataDocumento(id);
             this.logger.log(`✅ Metadatos eliminados en BD para: ${id}`);
             return result;
         } catch (e) {
