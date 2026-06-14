@@ -79,6 +79,7 @@ export class DocumentoService implements IDocumentosService {
         }
     }
 
+    
     async actualizarDocumento(id: string, nombre: string, idUsuario: string, contenido: string): Promise<any> {
         this.logger.log(`Iniciando guardado persistente para documento: ${id}`);
         const stream$ = from([{
@@ -111,7 +112,6 @@ export class DocumentoService implements IDocumentosService {
             throw new InternalServerErrorException(`Error actualizando metadatos: ${error.message || 'Desconocido'}`);
         }
     }
-
 
 async obtenerDocumentoPorId(id: string): Promise<any> {
 
