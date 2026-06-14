@@ -36,15 +36,15 @@ export class CarpetaController {
         return await this.carpetaService.actualizarCarpeta(id, body.nombre, req.user.idUsuario, body.readme);
     }
 
-    @Delete(':id/usuario/:idUsuario')
+    @Delete(':id/usuario')
     @HttpCode(HttpStatus.OK)
     async eliminarCarpeta(@Param('id') id: string,@Req() req: any) {
         return await this.carpetaService.eliminarCarpeta(id, req.user.idUsuario);
     }
 
-    @Delete('cache/invalidar/:idUsuario')
+    @Delete('cache/invalidar')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async invalidarCache(@Param('idUsuario') idUsuario: string) {
-        await this.carpetaService.invalidarCacheUsuario(idUsuario);
+    async invalidarCache(@Req() req: any) {
+        await this.carpetaService.invalidarCacheUsuario(req.user.idUsuario);
     }
 }
