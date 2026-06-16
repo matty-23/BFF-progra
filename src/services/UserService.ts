@@ -11,23 +11,13 @@ export default class UserService implements IUserService{
         const userDto: UserDto ={
             id: user.getId(),
             nombre: user.getNombre(),
+            apellido: user.getApellido(),
             email: user.getEmail(),
             username: user.getUsername(),
-            profileUrl: `http://localhost:3000/api/users/${user.getId()}/profile`
+            fechaCreacion: user.getFechaCreacion()
         }
         return userDto;
 
-    }
-    async createUser(user: UserDto): Promise <UserDto>{
-        const newUser= await this._UserClient.create(user);
-        const userDto: UserDto ={
-            id: newUser.getId(),
-            nombre: newUser.getNombre(),
-            email: newUser.getEmail(),
-            username: newUser.getUsername(),
-            profileUrl: `http://localhost:3000/api/users/${newUser.getId()}/profile`
-        }
-        return userDto;
     }
 
     async updateUser(id: string, user: UserDto): Promise<UserDto> {
