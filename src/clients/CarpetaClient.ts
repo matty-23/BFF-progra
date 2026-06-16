@@ -34,23 +34,23 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
     }
 
     async obtenerCarpetasPrincipales(idUsuario: string | number) {
-    const metadata = this.getGrpcMetadata();
-    const response = await firstValueFrom(this.carpetaGrpcService.CarpetasPrincipales({ id: String(idUsuario) }, metadata) );
+        const metadata = this.getGrpcMetadata();
+        const response = await firstValueFrom(this.carpetaGrpcService.CarpetasPrincipales({ id: String(idUsuario) }, metadata));
 
-    const todasLasRaices = response.carpetasPrincipales || [];
+        const todasLasRaices = response.carpetasPrincipales || [];
 
-    const miAreaCarpeta = todasLasRaices.find(c => c.nombre === "Mi Area");
-    const compartidosCarpeta = todasLasRaices.find(c => c.nombre === "Compartidos conmigo");
-    const recientesCarpeta = todasLasRaices.find(c => c.nombre === "Recientes");
-    const destacadosCarpeta = todasLasRaices.find(c => c.nombre === "Destacados");
+        const miAreaCarpeta = todasLasRaices.find(c => c.nombre === "Mi Area");
+        const compartidosCarpeta = todasLasRaices.find(c => c.nombre === "Compartidos conmigo");
+        const recientesCarpeta = todasLasRaices.find(c => c.nombre === "Recientes");
+        const destacadosCarpeta = todasLasRaices.find(c => c.nombre === "Destacados");
 
-    return {
-        MiArea: miAreaCarpeta ? (miAreaCarpeta.componentes || []).map(this.mapComponente) : [],
-        CompartidosConmigo: compartidosCarpeta ? (compartidosCarpeta.componentes || []).map(this.mapComponente) : [],
-        Recientes: recientesCarpeta ? (recientesCarpeta.componentes || []).map(this.mapComponente) : [],
-        Destacados: destacadosCarpeta ? (destacadosCarpeta.componentes || []).map(this.mapComponente) : []
-    };
-}
+        return {
+            MiArea: miAreaCarpeta ? [this.mapComponente(miAreaCarpeta)] : [],
+            CompartidosConmigo: compartidosCarpeta ? [this.mapComponente(compartidosCarpeta)] : [],
+            Recientes: recientesCarpeta ? [this.mapComponente(recientesCarpeta)] : [],
+            Destacados: destacadosCarpeta ? [this.mapComponente(destacadosCarpeta)] : []
+        };
+    }
 
     async obtenerContenidoCarpeta(id: string | number): Promise<ComponenteDto[]> {
         const metadata = this.getGrpcMetadata();
@@ -71,7 +71,7 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
 
     async actualizarCarpeta(id: string, nombre: string, idUsuario: string, readMe: string): Promise<boolean> {
         const metadata = this.getGrpcMetadata();
-        const request = {id,carp: { nombre, idUsuario, ReadMe: readMe }};
+        const request = { id, carp: { nombre, idUsuario, ReadMe: readMe } };
         const response = await firstValueFrom(this.carpetaGrpcService.Actualizar(request, metadata));
         return response.success;
     }
@@ -82,7 +82,6 @@ export class CarpetaClient implements ICarpetaClient, OnModuleInit {
             const response = await firstValueFrom(this.carpetaGrpcService.Eliminar({ id }, metadata));
             return response.success;
         } catch (error: any) {
-            console.error(`❌ [gRPC Error] Falló al eliminar la carpeta (ID: ${id})`);
             console.error(`Motivo:`, error.details || error.message);
             throw error;
         }

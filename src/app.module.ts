@@ -13,8 +13,8 @@ import { CarpetaController } from './controllers/CarpetaController';
 import { CarpetasCacheService } from './services/CarpetaService';
 import { CarpetaClient } from './clients/CarpetaClient';
 import { MongooseModule } from '@nestjs/mongoose';
-import { CarpetaCache, CarpetaCacheSchema } from './schemas/schemaCarpeta';
-import { CarpetaCacheRepository } from './repository/CarpetaRepository';
+import { CarpetaCache, CarpetaCacheSchema } from './database/schemas/schemaCarpeta';
+import { CarpetaCacheRepository } from './database/repository/CarpetaRepository';
 import { DocumentController } from './controllers/DocumentController';
 import { DocumentoService } from './services/DocumentoService';
 import { BDDocumentClient } from './clients/BDDocumentClient';
@@ -44,7 +44,7 @@ import { FSDocumentClient } from './clients/FSDocumentClient';
         options: {
           package: 'carpetas',
           protoPath: join(process.cwd(), 'src/proto/carpeta.proto'),
-          url: 'localhost:50053',
+          url: process.env.GRPC_AUTH_URL,
         },
       },
     ]),
@@ -55,18 +55,29 @@ import { FSDocumentClient } from './clients/FSDocumentClient';
         options: {
           package: 'documentos',
           protoPath: join(process.cwd(), 'src/proto/documento.proto'),
-          url: 'localhost:50053',
+          url: process.env.GRPC_AUTH_URL,
         },
       },
     ]),
     ClientsModule.register([
       {
-        name: 'STORAGE_PACKAGE', // Nombre para inyectar este cliente
+        name: 'STORAGE_PACKAGE', 
         transport: Transport.GRPC,
         options: {
           package: 'storage',
-          protoPath: join(process.cwd(), 'src/proto/storage.proto'), // Asegúrate de copiar el .proto aquí también
-          url: 'localhost:50051', // Puerto de tu microservicio de Storage
+          protoPath: join(process.cwd(), 'src/proto/storage.proto'), 
+          url: 'localhost:50051',
+        },
+      },
+    ]),
+    ClientsModule.register([
+      {
+        name: 'USER_PACKAGE',
+        transport: Transport.GRPC,
+        options: {
+          package: 'usuario',
+          protoPath: join(process.cwd(), 'src/proto/user.proto'),
+          url: process.env.GRPC_AUTH_URL,
         },
       },
     ]),

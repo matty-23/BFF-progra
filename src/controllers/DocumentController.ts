@@ -1,13 +1,11 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject, UseGuards, Req, ForbiddenException } from '@nestjs/common';
 import { IDocumentosService } from '../interfaces/IDocumentService';
-import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/JwtAuthGuard';
 
 @Controller('api/documentos')
 @UseGuards(JwtAuthGuard)
 export class DocumentController {
-    constructor(@Inject('IDocumentosService')private readonly documentosService: IDocumentosService) { }
-
+    constructor(@Inject('IDocumentosService') private readonly documentosService: IDocumentosService) { }
 
     @Get(':id')
     async obtenerDocumentoPorId(@Param('id') id: string) {
@@ -16,33 +14,18 @@ export class DocumentController {
 
     @Post(':idCarpeta')
     @HttpCode(HttpStatus.CREATED)
-    async crearDocumento(
-        @Param('idCarpeta') idCarpeta: string,
-        @Body() body: { nombre: string, idUsuario: string }
-    ) {
-        return await this.documentosService.crearDocumento(idCarpeta, body.nombre, body.idUsuario);
+    async crearDocumento(@Param('idCarpeta') idCarpeta: string,@Body() body: { nombre: string }, @Req() req: any) {
+        return await this.documentosService.crearDocumento(idCarpeta, body.nombre, req.user.idUsuario);
     }
 
     @Put(':id')
-    async actualizarDocumento(
-        @Param('id') id: string,
-        @Body() body: { nombre: string, idUsuario: string, contenido: string }
-    ) {
-        return await this.documentosService.actualizarDocumento(id, body.nombre, body.idUsuario, body.contenido);
+    async actualizarDocumento(@Param('id') id: string,@Body() body: { nombre: string, contenido: string }, @Req() req: any) {
+        return await this.documentosService.actualizarDocumento(id, body.nombre, req.user.idUsuario, body.contenido);
     }
 
-    @Delete(':id/usuario/:idUsuario')
+    @Delete(':id')
     @HttpCode(HttpStatus.OK)
-    async eliminarDocumento(
-        @Param('id') id: string,
-        @Param('idUsuario') idUsuario: string
-    ) {
-        return await this.documentosService.eliminarDocumento(id, idUsuario);
+    async eliminarDocumento(@Param('id') id: string,@Req() req: any) {
+        return await this.documentosService.eliminarDocumento(id);
     }
-
-
-
-
-
-
 }

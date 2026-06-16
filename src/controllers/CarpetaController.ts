@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject } from '@nestjs/common';
+import { Controller, Get, Post, Put, Delete, Param, Body, HttpCode, HttpStatus, Inject, Req, ForbiddenException } from '@nestjs/common';
 import { ICarpetaService } from '../interfaces/ICarpetaService';
 import { UseGuards } from '@nestjs/common';
 import { JwtAuthGuard } from '../guards/JwtAuthGuard';
@@ -10,7 +10,8 @@ export class CarpetaController {
     constructor(@Inject('ICarpetaService')private readonly carpetaService: ICarpetaService) { }
 
     @Get('carpetas-principales/:idUsuario')
-    async obtenerCarpetasPrincipales(@Param('idUsuario') idUsuario: string) {
+    async obtenerCarpetasPrincipales(@Param('idUsuario') idUsuario: string,@Req() req: any) {
+        if (req.user?.idUsuario !== idUsuario) throw new ForbiddenException('Acceso denegado');
         return await this.carpetaService.obtenerCarpetasPrincipales({ id: idUsuario });
     }
 
@@ -26,33 +27,24 @@ export class CarpetaController {
 
     @Post(':idPadre')
     @HttpCode(HttpStatus.CREATED)
-    async crearCarpeta(
-        @Param('idPadre') idPadre: string,
-        @Body() body: { nombre: string, idUsuario: string }
-    ) {
-        return await this.carpetaService.crearCarpeta(idPadre, body.nombre, body.idUsuario);
+    async crearCarpeta(@Param('idPadre') idPadre: string,@Body() body: { nombre: string }, @Req() req: any) {
+        return await this.carpetaService.crearCarpeta(idPadre, body.nombre, req.user.idUsuario);
     }
 
     @Put(':id')
-    async actualizarCarpeta(
-        @Param('id') id: string,
-        @Body() body: { nombre: string, idUsuario: string, readme: string }
-    ) {
-        return await this.carpetaService.actualizarCarpeta(id, body.nombre, body.idUsuario, body.readme);
+    async actualizarCarpeta(@Param('id') id: string,@Body() body: { nombre: string, readme: string },@Req() req: any) {
+        return await this.carpetaService.actualizarCarpeta(id, body.nombre, req.user.idUsuario, body.readme);
     }
 
-    @Delete(':id/usuario/:idUsuario')
+    @Delete(':id/usuario')
     @HttpCode(HttpStatus.OK)
-    async eliminarCarpeta(
-        @Param('id') id: string,
-        @Param('idUsuario') idUsuario: string
-    ) {
-        return await this.carpetaService.eliminarCarpeta(id, idUsuario);
+    async eliminarCarpeta(@Param('id') id: string,@Req() req: any) {
+        return await this.carpetaService.eliminarCarpeta(id, req.user.idUsuario);
     }
 
-    @Delete('cache/invalidar/:idUsuario')
+    @Delete('cache/invalidar')
     @HttpCode(HttpStatus.NO_CONTENT)
-    async invalidarCache(@Param('idUsuario') idUsuario: string) {
-        await this.carpetaService.invalidarCacheUsuario(idUsuario);
+    async invalidarCache(@Req() req: any) {
+        await this.carpetaService.invalidarCacheUsuario(req.user.idUsuario);
     }
 }

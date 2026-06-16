@@ -6,13 +6,17 @@ import { Observable } from 'rxjs';
 export class FSDocumentClient implements OnModuleInit {
     private storageService: any;
 
-    constructor(@Inject('STORAGE_PACKAGE') private client: ClientGrpc) {}
+    constructor(@Inject('STORAGE_PACKAGE') private client: ClientGrpc) { }
 
     onModuleInit() {
         this.storageService = this.client.getService<any>('StorageService');
     }
 
-    // Aquí expondremos los métodos que llamará el BFF
+get(id: string): Observable<any> {
+    return this.storageService.DownloadFile({
+        storageId: id
+    });
+}
     upload(data$: Observable<any>) {
         return this.storageService.UploadFile(data$);
     }
