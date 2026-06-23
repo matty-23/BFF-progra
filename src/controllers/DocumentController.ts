@@ -19,10 +19,11 @@ export class DocumentController {
     }
 
     @Put(':id')
-    async actualizarDocumento(@Param('id') id: string,@Body() body: { nombre: string, contenido: string }, @Req() req: any) {
-        return await this.documentosService.actualizarDocumento(id, body.nombre, req.user.idUsuario, body.contenido);
-    }
-
+async actualizarDocumento(@Param('id') id: string,@Body() body: { nombre: string, contenido: string, idUsuario?: string }, @Req() req: any) {
+    const userId = body.idUsuario || req.user?.idUsuario || req.user?.sub;
+    
+    return await this.documentosService.actualizarDocumento(id, body.nombre, userId, body.contenido);
+}
     @Delete(':id')
     @HttpCode(HttpStatus.OK)
     async eliminarDocumento(@Param('id') id: string,@Req() req: any) {
