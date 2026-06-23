@@ -39,8 +39,13 @@ export class AuthController {
         if (refreshToken) {
             await this.authService.LoginOut({ token: refreshToken });
         }
+        res.clearCookie('refreshToken', { 
+            path: '/api/auth',
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'strict'
+        });
         
-        res.clearCookie('refreshToken', { path: '/api/auth' });
         return { message: 'Logout exitoso' };
     }
 
